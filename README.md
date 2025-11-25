@@ -70,29 +70,172 @@ This script will:
 - Install all system dependencies
 - Clone and configure ComfyUI
 - Install required custom nodes
-- Download Flux and WAN 2.2 models (FP8 versions)
 - Configure all necessary folders
 - Generate API token
 
+**Note**: The setup script prepares the environment. To download models, you can either:
+
+**Option A: Use the download scripts** (Recommended)
+```bash
+# After setup-comfyui.sh completes
+cd ComfyUI
+chmod +x ../download-modelos-flux.sh ../download-modelos-wan22.sh
+../download-modelos-flux.sh .
+../download-modelos-wan22.sh .
+```
+
+The download scripts are interactive and will:
+- Check available disk space
+- Download models from HuggingFace
+- Install custom nodes automatically
+- Verify file integrity
+- Show progress and summaries
+
+**Option B: Download manually** from HuggingFace repositories (see [Installed Models](#-installed-models) section for links)
+
 ### 4. Manual Setup (Alternative)
 
-If you prefer manual setup, see the [Manual Installation Guide](MANUAL_SETUP.md).
+If you prefer manual setup:
+
+1. **Install ComfyUI** following the [official documentation](https://github.com/comfyanonymous/ComfyUI)
+2. **Use the download scripts** provided in this repository:
+   ```bash
+   ./download-modelos-flux.sh /path/to/ComfyUI
+   ./download-modelos-wan22.sh /path/to/ComfyUI
+   ```
+3. **Or download models manually** from HuggingFace (see [Installed Models](#-installed-models) section for direct links)
 
 ## 📦 Installed Models
 
-The setup script installs the following FP8 models:
+The setup script installs the following FP8 models. You can also use the provided download scripts for manual installation:
 
-### Flux Models
-- `flux1-krea-dev_fp8_scaled.safetensors` - Main Flux model for image generation
-- `clip_l.safetensors` - CLIP encoder
-- `t5xxl_fp8_e4m3fn_scaled.safetensors` - T5XXL CLIP encoder (FP8)
-- `ae.safetensors` - VAE decoder
+### Flux Models (Required for Image Generation)
 
-### WAN 2.2 Models
-- `wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors` - High noise UNet
-- `wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors` - Low noise UNet
-- `umt5_xxl_fp8_e4m3fn_scaled.safetensors` - UMT5 CLIP loader
-- `wan_2.1_vae.safetensors` - WAN VAE
+**Location**: `ComfyUI/models/`
+
+#### Diffusion Models (UNET)
+- **`models/diffusion_models/flux1-krea-dev_fp8_scaled.safetensors`** (Required)
+  - Main Flux model for image generation
+  - Recommended for portraits/people
+  - Source: [Comfy-Org/FLUX.1-Krea-dev_ComfyUI](https://huggingface.co/Comfy-Org/FLUX.1-Krea-dev_ComfyUI)
+- **`models/unet/flux1-dev-fp8.safetensors`** (Optional, ~23GB)
+  - Alternative Flux model, more versatile
+  - For GPUs with 16GB+ VRAM
+
+#### Text Encoders (CLIP)
+- **`models/text_encoders/t5xxl_fp8_e4m3fn_scaled.safetensors`** (Required)
+  - T5XXL CLIP encoder in FP8 format
+  - Recommended for RTX 3060 12GB
+  - Source: [comfyanonymous/flux_text_encoders](https://huggingface.co/comfyanonymous/flux_text_encoders)
+- **`models/text_encoders/t5xxl_fp16.safetensors`** (Optional)
+  - T5XXL CLIP encoder in FP16 format
+  - For GPUs with 16GB+ VRAM
+- **`models/text_encoders/clip_l.safetensors`** (Required)
+  - CLIP-L encoder
+  - Source: [comfyanonymous/flux_text_encoders](https://huggingface.co/comfyanonymous/flux_text_encoders)
+
+#### VAE
+- **`models/vae/ae.safetensors`** (Required)
+  - VAE decoder for Flux
+  - Source: [Comfy-Org/Lumina_Image_2.0_Repackaged](https://huggingface.co/Comfy-Org/Lumina_Image_2.0_Repackaged)
+
+### WAN 2.2 Models (Required for Video Generation)
+
+**Location**: `ComfyUI/models/`
+
+#### Diffusion Models (UNET)
+- **`models/diffusion_models/wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors`** (Required, ~14GB)
+  - High noise UNet - Recommended (better quality, more details)
+  - Main WAN 2.2 model for video generation
+  - Source: [Comfy-Org/Wan_2.2_ComfyUI_Repackaged](https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged)
+- **`models/diffusion_models/wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors`** (Alternative, ~14GB)
+  - Low noise UNet - Less noise, smoother results
+  - Alternative to high_noise version
+
+#### Text Encoders (CLIP)
+- **`models/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors`** (Required, ~6.3GB)
+  - UMT5-XXL CLIP loader for WAN 2.2
+  - Source: [Comfy-Org/Wan_2.2_ComfyUI_Repackaged](https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged)
+
+#### VAE
+- **`models/vae/wan_2.1_vae.safetensors`** (Required)
+  - WAN 2.1 VAE for video generation
+  - Source: [Comfy-Org/Wan_2.1_ComfyUI_repackaged](https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged)
+
+#### VFI (Frame Interpolation)
+- **`models/vfi/film_net_fp32.pt`** (Required, ~132MB)
+  - FILM VFI model for frame interpolation (increasing FPS)
+  - Source: [nguu/film-pytorch](https://huggingface.co/nguu/film-pytorch) or [lucas-hug/film](https://huggingface.co/lucas-hug/film)
+
+#### LoRAs (Optional but Recommended)
+- **`models/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors`** (Optional)
+  - LoRA for high noise model - improves video quality
+- **`models/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors`** (Optional)
+  - LoRA for low noise model - improves video quality
+- Source: [Comfy-Org/Wan_2.2_ComfyUI_Repackaged](https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged)
+
+### Custom Nodes (Required)
+
+**Location**: `ComfyUI/custom_nodes/`
+
+The following custom nodes are **required** for the workflow to function:
+
+1. **ComfyUI-KJNodes** - Contains WanVideoNAG node
+   - Repository: [kijai/ComfyUI-KJNodes](https://github.com/kijai/ComfyUI-KJNodes)
+   
+2. **ComfyUI-NegiTools** - Seed Generator
+   - Repository: [natto-maki/ComfyUI-NegiTools](https://github.com/natto-maki/ComfyUI-NegiTools)
+   
+3. **ComfyUI-VideoHelperSuite (VHS)** - Video Combine and utilities
+   - Repository: [Kosinkadink/ComfyUI-VideoHelperSuite](https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite)
+   
+4. **comfyui-frame-interpolation** - FILM VFI for frame interpolation
+   - Repository: [Fannovel16/comfyui-frame-interpolation](https://github.com/Fannovel16/comfyui-frame-interpolation)
+   
+5. **rgthree-comfy** - Power Lora Loader
+   - Repository: [rgthree/rgthree-comfy](https://github.com/rgthree/rgthree-comfy)
+
+6. **ComfyUI-FLUX** - DualCLIPLoader for Flux models
+   - Install via ComfyUI Manager or manually
+   
+7. **ComfyUI-Manager** - For easy node management
+   - Repository: [ltdrdata/ComfyUI-Manager](https://github.com/ltdrdata/ComfyUI-Manager)
+
+### Manual Download Scripts
+
+This repository includes automated download scripts in the root directory:
+
+- **`download-modelos-flux.sh`** - Downloads all Flux models
+  - Downloads UNET, CLIP encoders, and VAE
+  - Interactive prompts for optional models
+  - Verifies disk space before downloading
+  
+- **`download-modelos-wan22.sh`** - Downloads all WAN 2.2 models and custom nodes
+  - Downloads UNET, CLIP, VAE, FILM VFI, and optional LoRAs
+  - Installs all required custom nodes automatically
+  - Checks disk space (requires ~26GB minimum)
+
+**Usage:**
+```bash
+# Make scripts executable
+chmod +x download-modelos-flux.sh download-modelos-wan22.sh
+
+# Download Flux models
+./download-modelos-flux.sh /path/to/ComfyUI
+
+# Download WAN 2.2 models (includes custom nodes installation)
+./download-modelos-wan22.sh /path/to/ComfyUI
+```
+
+**Features:**
+- ✅ Interactive prompts for optional downloads
+- ✅ Disk space verification
+- ✅ Automatic custom node installation via Git
+- ✅ File integrity checks
+- ✅ Progress indicators
+- ✅ Skips already downloaded files (with confirmation)
+- ✅ Creates necessary directory structure
+- ✅ Color-coded output for better readability
 
 ## 🔧 Configuration
 
@@ -221,11 +364,31 @@ tar -czf comfyui-models-backup.tar.gz ComfyUI/models/
 
 ## 🔗 Useful Links
 
+### Infrastructure
 - [vast.ai Dashboard (Referral Link)](https://cloud.vast.ai/?ref_id=350820)
 - [ComfyUI GitHub](https://github.com/comfyanonymous/ComfyUI)
 - [ComfyUI Documentation](https://github.com/comfyanonymous/ComfyUI/wiki)
-- [WAN 2.2 Repository](https://github.com/tencent-ailab/IP-Adapter)
-- [Flux Model Repository](https://huggingface.co/black-forest-labs)
+
+### Model Repositories
+- **Flux Models**:
+  - [Comfy-Org/FLUX.1-Krea-dev_ComfyUI](https://huggingface.co/Comfy-Org/FLUX.1-Krea-dev_ComfyUI)
+  - [comfyanonymous/flux_text_encoders](https://huggingface.co/comfyanonymous/flux_text_encoders)
+  - [Comfy-Org/Lumina_Image_2.0_Repackaged](https://huggingface.co/Comfy-Org/Lumina_Image_2.0_Repackaged)
+- **WAN 2.2 Models**:
+  - [Comfy-Org/Wan_2.2_ComfyUI_Repackaged](https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged)
+  - [Comfy-Org/Wan_2.1_ComfyUI_repackaged](https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged)
+  - [wan-research/wan2.1](https://huggingface.co/wan-research/wan2.1)
+- **FILM VFI**:
+  - [nguu/film-pytorch](https://huggingface.co/nguu/film-pytorch)
+  - [lucas-hug/film](https://huggingface.co/lucas-hug/film)
+
+### Custom Nodes
+- [ComfyUI-KJNodes](https://github.com/kijai/ComfyUI-KJNodes) - WanVideoNAG
+- [ComfyUI-NegiTools](https://github.com/natto-maki/ComfyUI-NegiTools) - Seed Generator
+- [ComfyUI-VideoHelperSuite](https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite) - VHS
+- [comfyui-frame-interpolation](https://github.com/Fannovel16/comfyui-frame-interpolation) - FILM VFI
+- [rgthree-comfy](https://github.com/rgthree/rgthree-comfy) - Power Lora Loader
+- [ComfyUI-Manager](https://github.com/ltdrdata/ComfyUI-Manager) - Node Manager
 
 ## 📄 License
 
