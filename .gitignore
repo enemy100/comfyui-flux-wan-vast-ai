@@ -1,0 +1,38 @@
+# Environment variables
+.env
+.env.local
+*.env
+
+# API tokens and secrets
+*.key
+*.pem
+secrets/
+tokens/
+
+# Logs
+*.log
+logs/
+comfyui-logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*~
+
+# Backup files
+*.backup
+*.bak
+*.tar.gz
+
