@@ -24,6 +24,9 @@ This repository contains scripts and documentation to deploy ComfyUI with Flux a
 
 > **Cost Comparison**: Renting an RTX 4090 24GB on [vast.ai](https://cloud.vast.ai/?ref_id=350820) is significantly cheaper than using services like VEO 3.1, Runway Gen-3, Sora 2, etc., while providing full control over the infrastructure.
 >
+> <img width="823" height="118" alt="image" src="https://github.com/user-attachments/assets/01e3ea93-00e5-49ae-81a8-016541269601" />
+
+>
 > 💡 **Support this project**: Use our [referral link](https://cloud.vast.ai/?ref_id=350820) when signing up for vast.ai!
 
 ## 🚀 Quick Start
