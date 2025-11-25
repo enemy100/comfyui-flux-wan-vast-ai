@@ -19,7 +19,7 @@ This repository contains scripts and documentation to deploy ComfyUI with Flux a
 
 ### Recommended for Best Performance
 - **GPU**: RTX 4090 24GB (tested and recommended)
-- **Storage**: 200GB+ disk space
+- **Storage**: 100GB+ disk space
 - **RAM**: 32GB+
 
 > **Cost Comparison**: Renting an RTX 4090 24GB on [vast.ai](https://cloud.vast.ai/?ref_id=350820) is significantly cheaper than using services like VEO 3.1, Runway Gen-3, Sora 2, etc., while providing full control over the infrastructure.
