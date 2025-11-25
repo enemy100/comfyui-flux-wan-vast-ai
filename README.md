@@ -263,9 +263,11 @@ python3 main.py --listen 0.0.0.0 --port 8188
 
 **No additional setup needed!** vast.ai handles the tunneling automatically.
 
-#### Using Cloudflare Tunnel (Alternative)
+#### Using Cloudflare Tunnel (For Local Installations Only)
 
-If you need an alternative tunnel (not using vast.ai or want additional tunnel):
+> ⚠️ **Important**: Cloudflare Tunnel works for **local installations** (home/office with router), but **NOT for cloud services** like vast.ai. Cloud services have their own tunneling systems.
+
+**Use this when**: ComfyUI is running locally at home/office behind a router
 
 ```bash
 # Install cloudflared
@@ -278,6 +280,11 @@ cloudflared tunnel --url http://localhost:8188
 ```
 
 This will give you a public URL like `https://xxxxx.trycloudflare.com`
+
+**Why not on cloud services:**
+- Cloud services (vast.ai, AWS, GCP, etc.) already provide built-in tunneling
+- cloudflared doesn't work well in containerized cloud environments
+- Use the service's native tunnel instead (vast.ai provides it automatically)
 
 ## 📊 Monitoring
 
