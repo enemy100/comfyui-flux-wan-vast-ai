@@ -250,9 +250,23 @@ cd ComfyUI
 python3 main.py --listen 0.0.0.0 --port 8188
 ```
 
-### Expose ComfyUI (Optional)
+### Expose ComfyUI
 
-#### Using Cloudflare Tunnel
+#### Using vast.ai Built-in Tunnel (Recommended for vast.ai Instances)
+
+**vast.ai automatically provides access when you create an instance:**
+
+1. **Check your vast.ai dashboard** for the instance
+2. **Find the "Connect" or "Access" section**
+3. **Copy the provided URL** (includes token automatically)
+4. **Use this URL** to access ComfyUI - it automatically routes to port 8188
+
+**No additional setup needed!** vast.ai handles the tunneling automatically.
+
+#### Using Cloudflare Tunnel (Alternative)
+
+If you need an alternative tunnel (not using vast.ai or want additional tunnel):
+
 ```bash
 # Install cloudflared
 wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
