@@ -22,13 +22,15 @@ This repository contains scripts and documentation to deploy ComfyUI with Flux a
 - **Storage**: 200GB+ disk space
 - **RAM**: 32GB+
 
-> **Cost Comparison**: Renting an RTX 4090 24GB on vast.ai is significantly cheaper than using services like VEO 3.1, Runway Gen-3, Sora 2, etc., while providing full control over the infrastructure.
+> **Cost Comparison**: Renting an RTX 4090 24GB on [vast.ai](https://cloud.vast.ai/?ref_id=350820) is significantly cheaper than using services like VEO 3.1, Runway Gen-3, Sora 2, etc., while providing full control over the infrastructure.
+>
+> 💡 **Support this project**: Use our [referral link](https://cloud.vast.ai/?ref_id=350820) when signing up for vast.ai!
 
 ## 🚀 Quick Start
 
 ### 1. Create Account on vast.ai
 
-1. Sign up at [vast.ai](https://cloud.vast.ai/?ref_id=350820)
+1. Sign up at [vast.ai using our referral link](https://cloud.vast.ai/?ref_id=350820) (helps support this project)
 2. Add payment method
 3. Navigate to **Create** → **Instance**
 
@@ -216,7 +218,7 @@ tar -czf comfyui-models-backup.tar.gz ComfyUI/models/
 
 ## 🔗 Useful Links
 
-- [vast.ai Dashboard](https://cloud.vast.ai/?ref_id=350820)
+- [vast.ai Dashboard (Referral Link)](https://cloud.vast.ai/?ref_id=350820)
 - [ComfyUI GitHub](https://github.com/comfyanonymous/ComfyUI)
 - [ComfyUI Documentation](https://github.com/comfyanonymous/ComfyUI/wiki)
 - [WAN 2.2 Repository](https://github.com/tencent-ailab/IP-Adapter)
