@@ -7,8 +7,8 @@ Complete guide and automated scripts to set up ComfyUI with Flux 1.dev and WAN 2
 This repository contains scripts and documentation to deploy ComfyUI with Flux and WAN 2.2 models on vast.ai, providing a cost-effective GPU solution for video generation workflows.
 
 > **Related Projects**:
-> - [n8n ComfyUI Video Generation Workflow](https://github.com/YOUR_USERNAME/n8n-comfyui-workflow) - The automation workflow that uses this infrastructure
-> - [n8n ComfyUI Integration Guide](https://github.com/YOUR_USERNAME/n8n-comfyui-integration) - How to connect n8n with this ComfyUI instance
+> - [n8n ComfyUI Video Generation Workflow](https://github.com/enemy100/n8n-comfyui-workflow) - The automation workflow that uses this infrastructure
+> - [n8n ComfyUI Integration Guide](https://github.com/enemy100/n8n-comfyui-integration) - How to connect n8n with this ComfyUI instance
 
 ## 🖥️ Recommended Hardware
 
@@ -51,7 +51,7 @@ Once the instance is created, SSH into it and run:
 
 ```bash
 # Clone this repository
-git clone https://github.com/YOUR_USERNAME/comfyui-flux-wan-vast-ai.git
+git clone https://github.com/enemy100/comfyui-flux-wan-vast-ai.git
 cd comfyui-flux-wan-vast-ai
 
 # Make scripts executable
@@ -142,7 +142,7 @@ journalctl -u comfyui -f
 
 After setting up ComfyUI, you'll need to connect it with n8n:
 
-1. See the [n8n ComfyUI Integration Guide](https://github.com/YOUR_USERNAME/n8n-comfyui-integration) for detailed instructions
+1. See the [n8n ComfyUI Integration Guide](https://github.com/enemy100/n8n-comfyui-integration) for detailed instructions
 2. Configure network access (tunnel, ports, etc.)
 3. Get your ComfyUI URL and API token
 4. Use these credentials in the n8n workflow
