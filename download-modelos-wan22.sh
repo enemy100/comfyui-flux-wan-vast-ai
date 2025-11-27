@@ -195,8 +195,8 @@ print_info "Usando ComfyUI em: $COMFYUI_PATH"
 print_info "Verificando espaço em disco..."
 AVAILABLE_GB=$(df -BG "$COMFYUI_PATH" | tail -1 | awk '{print $4}' | sed 's/G//')
 print_info "Espaço disponível: ${AVAILABLE_GB}GB"
-print_warning "Espaço necessário aproximado: ~25GB (modelos) + ~1GB (custom nodes)"
-if [ "$AVAILABLE_GB" -lt 26 ]; then
+print_warning "Espaço necessário aproximado: ~40GB (modelos: 2x UNET ~28GB + outros ~12GB) + ~1GB (custom nodes)"
+if [ "$AVAILABLE_GB" -lt 41 ]; then
     print_error "ATENÇÃO: Espaço em disco pode ser insuficiente!"
     read -p "Continuar mesmo assim? (s/N): " -n 1 -r
     echo
@@ -221,45 +221,59 @@ echo
 
 # 1. UNET - Wan 2.2 14B fp8_scaled (OBRIGATÓRIO)
 print_info "1. Baixando UNET: Wan 2.2 14B fp8_scaled"
-print_warning "Este é o modelo principal do Wan 2.2 (~14GB). OBRIGATÓRIO!"
-print_info "Escolha a versão do modelo:"
-print_info "  [1] high_noise (recomendado - melhor qualidade, mais detalhes)"
-print_info "  [2] low_noise (menos ruído, pode ser mais suave)"
-print_warning "Qual versão deseja baixar? (1/2) [padrão: 1]: "
-read -p "" -n 1 -r
-echo
-UNET_VERSION="high_noise"
-if [[ $REPLY =~ ^[2]$ ]]; then
-    UNET_VERSION="low_noise"
-fi
+print_warning "Este é o modelo principal do Wan 2.2 (~14GB cada). OBRIGATÓRIO!"
+print_info "Baixando AMBOS os modelos (high_noise e low_noise) para máxima compatibilidade"
+check_disk_space 30 || exit 1
 
-UNET_FILENAME="wan2.2_i2v_${UNET_VERSION}_14B_fp8_scaled.safetensors"
-print_info "Baixando: $UNET_FILENAME"
-check_disk_space 15 || exit 1
-
-# Baixar para diffusion_models e criar link em unet
-UNET_DOWNLOADED=0
+# Baixar high_noise
+UNET_HIGH_FILENAME="wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors"
+print_info "1.1. Baixando: $UNET_HIGH_FILENAME"
+UNET_HIGH_DOWNLOADED=0
 
 # Tentativa 1: Comfy-Org (link que funcionou)
 print_info "Tentativa 1: Comfy-Org repositório..."
 download_file \
-    "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/diffusion_models/$UNET_FILENAME" \
-    "$DIFFUSION_MODELS_DIR/$UNET_FILENAME" && UNET_DOWNLOADED=1
+    "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/diffusion_models/$UNET_HIGH_FILENAME" \
+    "$DIFFUSION_MODELS_DIR/$UNET_HIGH_FILENAME" && UNET_HIGH_DOWNLOADED=1
 
 # Criar link simbólico em unet/ para compatibilidade
-if [ $UNET_DOWNLOADED -eq 1 ]; then
+if [ $UNET_HIGH_DOWNLOADED -eq 1 ]; then
     mkdir -p "$UNET_DIR"
-    if [ ! -e "$UNET_DIR/$UNET_FILENAME" ]; then
-        ln -s "../diffusion_models/$UNET_FILENAME" \
-            "$UNET_DIR/$UNET_FILENAME"
-        print_success "Link simbólico criado em unet/"
+    if [ ! -e "$UNET_DIR/$UNET_HIGH_FILENAME" ]; then
+        ln -s "../diffusion_models/$UNET_HIGH_FILENAME" \
+            "$UNET_DIR/$UNET_HIGH_FILENAME"
+        print_success "Link simbólico criado em unet/ para high_noise"
     fi
-fi
-
-if [ $UNET_DOWNLOADED -eq 0 ]; then
-    print_error "Link do UNET falhou. Baixe manualmente de:"
+else
+    print_error "Link do UNET high_noise falhou. Baixe manualmente de:"
     print_info "  - https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged"
-    print_info "  - Arquivo: $UNET_FILENAME"
+    print_info "  - Arquivo: $UNET_HIGH_FILENAME"
+fi
+echo
+
+# Baixar low_noise
+UNET_LOW_FILENAME="wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors"
+print_info "1.2. Baixando: $UNET_LOW_FILENAME"
+UNET_LOW_DOWNLOADED=0
+
+# Tentativa 1: Comfy-Org (link que funcionou)
+print_info "Tentativa 1: Comfy-Org repositório..."
+download_file \
+    "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/diffusion_models/$UNET_LOW_FILENAME" \
+    "$DIFFUSION_MODELS_DIR/$UNET_LOW_FILENAME" && UNET_LOW_DOWNLOADED=1
+
+# Criar link simbólico em unet/ para compatibilidade
+if [ $UNET_LOW_DOWNLOADED -eq 1 ]; then
+    mkdir -p "$UNET_DIR"
+    if [ ! -e "$UNET_DIR/$UNET_LOW_FILENAME" ]; then
+        ln -s "../diffusion_models/$UNET_LOW_FILENAME" \
+            "$UNET_DIR/$UNET_LOW_FILENAME"
+        print_success "Link simbólico criado em unet/ para low_noise"
+    fi
+else
+    print_error "Link do UNET low_noise falhou. Baixe manualmente de:"
+    print_info "  - https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged"
+    print_info "  - Arquivo: $UNET_LOW_FILENAME"
 fi
 echo
 
