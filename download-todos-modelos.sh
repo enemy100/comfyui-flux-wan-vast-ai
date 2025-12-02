@@ -110,13 +110,22 @@ install_custom_node() {
     local node_name=$2
     local custom_nodes_dir="$COMFYUI_PATH/custom_nodes"
     
+    # Converter para caminho absoluto ANTES de usar
+    custom_nodes_dir=$(cd "$custom_nodes_dir" 2>/dev/null && pwd) || {
+        print_error "Não foi possível acessar o diretório: $COMFYUI_PATH/custom_nodes"
+        return 1
+    }
+    
     # Extrair nome do repositório da URL
     local repo_name=$(basename "$repo_url" .git)
     repo_name=$(basename "$repo_name")
     local node_dir="$custom_nodes_dir/$repo_name"
     
     # Criar diretório se não existir
-    mkdir -p "$custom_nodes_dir"
+    mkdir -p "$custom_nodes_dir" || {
+        print_error "Não foi possível criar o diretório: $custom_nodes_dir"
+        return 1
+    }
     
     # Verificar se já está instalado
     if [ -d "$node_dir" ]; then
@@ -127,29 +136,51 @@ install_custom_node() {
     
     print_info "Instalando custom node: $node_name"
     print_info "Repositório: $repo_url"
+    print_info "Diretório de destino: $custom_nodes_dir"
     
     if ! command -v git &> /dev/null; then
         print_error "Git não encontrado. Instale git para continuar."
         return 1
     fi
     
-    cd "$custom_nodes_dir" || return 1
-    if git clone "$repo_url" 2>&1; then
+    # Salvar diretório atual
+    local current_dir=$(pwd)
+    
+    # Mudar para o diretório e clonar
+    cd "$custom_nodes_dir" || {
+        print_error "Não foi possível acessar: $custom_nodes_dir"
+        return 1
+    }
+    
+    # Limpar credenciais do Git para este clone (repositórios públicos não precisam)
+    # Usar GIT_TERMINAL_PROMPT=0 para evitar prompt interativo
+    if GIT_TERMINAL_PROMPT=0 git clone "$repo_url" 2>&1 | grep -v "Username for" | grep -v "Password for"; then
+        # Voltar para o diretório original
+        cd "$current_dir" || true
+        
         if [ -d "$node_dir" ]; then
             print_success "Custom node instalado: $node_name"
+            print_info "Localização: $node_dir"
             return 0
         else
-            local found_dir=$(find "$custom_nodes_dir" -maxdepth 1 -type d -name "*${repo_name}*" | head -1)
+            # Procurar em qualquer lugar dentro de custom_nodes
+            local found_dir=$(find "$custom_nodes_dir" -maxdepth 2 -type d -name "$repo_name" 2>/dev/null | head -1)
             if [ -n "$found_dir" ]; then
                 print_success "Custom node instalado: $node_name (em: $found_dir)"
                 return 0
             else
-                print_warning "Custom node clonado, mas diretório não encontrado. Verifique manualmente."
+                print_warning "Custom node clonado, mas diretório não encontrado."
+                print_info "Verifique manualmente em: $custom_nodes_dir"
+                print_info "Listando conteúdo de $custom_nodes_dir:"
+                ls -la "$custom_nodes_dir" 2>/dev/null || true
                 return 0
             fi
         fi
     else
+        # Voltar para o diretório original
+        cd "$current_dir" || true
         print_error "Erro ao clonar repositório: $node_name"
+        print_info "Tentando clonar manualmente: cd $custom_nodes_dir && git clone $repo_url"
         return 1
     fi
 }
@@ -175,6 +206,9 @@ if [ ! -d "$COMFYUI_PATH" ]; then
     print_error "Diretório não encontrado: $COMFYUI_PATH"
     exit 1
 fi
+
+# Converter para caminho absoluto
+COMFYUI_PATH=$(cd "$COMFYUI_PATH" && pwd)
 
 print_info "Usando ComfyUI em: $COMFYUI_PATH"
 
@@ -351,10 +385,16 @@ print_success "=== PARTE 3: INSTALANDO CUSTOM NODES ==="
 echo
 
 # 12. ComfyUI-FLUX (para DualCLIPLoader)
-print_info "12. Instalando ComfyUI-FLUX (para DualCLIPLoader)"
-install_custom_node \
-    "https://github.com/Comfy-Org/ComfyUI-FLUX.git" \
-    "ComfyUI-FLUX"
+# NOTA: O repositório Comfy-Org/ComfyUI-FLUX não existe mais (404).
+# O DualCLIPLoader geralmente já está incluído no ComfyUI base desde versões recentes.
+# Se você precisar do DualCLIPLoader e não estiver disponível, tente:
+# 1. Atualizar o ComfyUI para a versão mais recente
+# 2. Verificar se está disponível via ComfyUI-Manager
+# 3. Procurar por repositórios alternativos na comunidade
+print_info "12. ComfyUI-FLUX (para DualCLIPLoader)"
+print_warning "Repositório Comfy-Org/ComfyUI-FLUX não encontrado (404)."
+print_info "O DualCLIPLoader geralmente já está incluído no ComfyUI base."
+print_info "Se não estiver disponível, atualize o ComfyUI ou instale via ComfyUI-Manager."
 echo
 
 # 13. WanVideoNAG (dentro do ComfyUI-KJNodes)
