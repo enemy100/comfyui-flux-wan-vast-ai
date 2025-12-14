@@ -360,21 +360,21 @@ download_file \
 }
 echo
 
-# 11. LoRAs Wan 2.2 (opcionais mas recomendados)
-print_info "11. Baixando LoRAs Wan 2.2 (opcionais)"
-print_info "11.1. Baixando LoRA: wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors"
+# 11. LoRAs Wan 2.2 (opcionais mas recomendados) - Versão 1.1
+print_info "11. Baixando LoRAs Wan 2.2 v1.1 (opcionais mas recomendados)"
+print_info "11.1. Baixando LoRA: wan2.2_t2v_lightx2v_4steps_lora_v1.1_low_noise.safetensors"
 download_file \
-    "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors" \
-    "$LORAS_DIR/wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors" || {
-    print_warning "LoRA low_noise não encontrado. Pode não ser necessário."
+    "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/loras/wan2.2_t2v_lightx2v_4steps_lora_v1.1_low_noise.safetensors" \
+    "$LORAS_DIR/wan2.2_t2v_lightx2v_4steps_lora_v1.1_low_noise.safetensors" || {
+    print_warning "LoRA low_noise v1.1 não encontrado. Pode não ser necessário."
 }
 echo
 
-print_info "11.2. Baixando LoRA: wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors"
+print_info "11.2. Baixando LoRA: wan2.2_t2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors"
 download_file \
-    "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors" \
-    "$LORAS_DIR/wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors" || {
-    print_warning "LoRA high_noise não encontrado. Pode não ser necessário."
+    "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/loras/wan2.2_t2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors" \
+    "$LORAS_DIR/wan2.2_t2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors" || {
+    print_warning "LoRA high_noise v1.1 não encontrado. Pode não ser necessário."
 }
 echo
 
@@ -467,6 +467,7 @@ ls -lh "$VFI_DIR"/film_net* 2>/dev/null || echo "  (nenhum)"
 echo
 echo "LoRAs:"
 ls -lh "$LORAS_DIR"/wan2.2* 2>/dev/null || echo "  (nenhum - opcional)"
+echo "  Nota: Versão v1.1 (wan2.2_t2v_lightx2v_4steps_lora_v1.1_*) é a mais recente"
 echo
 
 echo "=== CUSTOM NODES ==="
