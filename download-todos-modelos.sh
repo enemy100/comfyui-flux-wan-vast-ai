@@ -216,10 +216,40 @@ print_info "Usando ComfyUI em: $COMFYUI_PATH"
 print_info "Verificando espaço em disco..."
 AVAILABLE_GB=$(df -BG "$COMFYUI_PATH" | tail -1 | awk '{print $4}' | sed 's/G//')
 print_info "Espaço disponível: ${AVAILABLE_GB}GB"
-print_warning "Espaço necessário aproximado: ~70GB (Flux ~30GB + Wan 2.2 ~40GB)"
-if [ "$AVAILABLE_GB" -lt 71 ]; then
+
+# Cálculo detalhado do espaço necessário (SEM fp16 e SEM LoRAs):
+# FLUX:
+#   - flux1-krea-dev_fp8_scaled.safetensors: ~12GB
+#   - t5xxl_fp8_e4m3fn_scaled.safetensors: ~5GB
+#   - t5xxl_fp16.safetensors: ~10GB (NÃO BAIXADO - comentado)
+#   - clip_l.safetensors: ~1.5GB
+#   - ae.safetensors (VAE): ~1GB
+#   Subtotal Flux: ~19.5GB (sem fp16)
+#
+# WAN 2.2:
+#   - wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors: ~15GB
+#   - wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors: ~15GB
+#   - umt5_xxl_fp8_e4m3fn_scaled.safetensors: ~7GB
+#   - wan_2.1_vae.safetensors: ~1GB
+#   - film_net_fp32.pt (VFI): ~0.5GB
+#   Subtotal WAN 2.2: ~38.5GB
+#
+# Custom Nodes: ~0.5GB
+# Total: ~58.5GB + margem de segurança = ~65GB recomendado
+
+REQUIRED_GB=65
+print_warning "Espaço necessário aproximado: ~${REQUIRED_GB}GB"
+print_info "  - Flux models (sem fp16): ~19.5GB"
+print_info "  - Wan 2.2 models: ~38.5GB"
+print_info "  - Custom nodes: ~0.5GB"
+print_info "  - Margem de segurança: ~6.5GB"
+print_info "  (Economizado: ~10GB ao não baixar fp16 + LoRAs)"
+if [ "$AVAILABLE_GB" -lt "$REQUIRED_GB" ]; then
     print_error "ATENÇÃO: Espaço em disco pode ser insuficiente!"
-    print_warning "Continuando mesmo assim..."
+    print_warning "Necessário: ${REQUIRED_GB}GB | Disponível: ${AVAILABLE_GB}GB"
+    print_warning "Continuando mesmo assim, mas pode falhar durante o download..."
+else
+    print_success "Espaço em disco suficiente: ${AVAILABLE_GB}GB disponível"
 fi
 echo
 
@@ -257,11 +287,13 @@ download_file \
 echo
 
 # 3. CLIP - T5-XXL fp16
-print_info "3. Baixando CLIP Flux: t5xxl_fp16.safetensors"
-download_file \
-    "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp16.safetensors" \
-    "$TEXT_ENCODERS_DIR/t5xxl_fp16.safetensors"
-echo
+# COMENTADO: fp16 não é necessário se você já tem fp8 (economiza ~10GB)
+# O fp8 é suficiente para o workflow atual
+# print_info "3. Baixando CLIP Flux: t5xxl_fp16.safetensors"
+# download_file \
+#     "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp16.safetensors" \
+#     "$TEXT_ENCODERS_DIR/t5xxl_fp16.safetensors"
+# echo
 
 # 4. CLIP - CLIP-L
 print_info "4. Baixando CLIP Flux: clip_l.safetensors"
@@ -361,22 +393,25 @@ download_file \
 echo
 
 # 11. LoRAs Wan 2.2 (opcionais mas recomendados) - Versão 1.1
-print_info "11. Baixando LoRAs Wan 2.2 v1.1 (opcionais mas recomendados)"
-print_info "11.1. Baixando LoRA: wan2.2_t2v_lightx2v_4steps_lora_v1.1_low_noise.safetensors"
-download_file \
-    "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/loras/wan2.2_t2v_lightx2v_4steps_lora_v1.1_low_noise.safetensors" \
-    "$LORAS_DIR/wan2.2_t2v_lightx2v_4steps_lora_v1.1_low_noise.safetensors" || {
-    print_warning "LoRA low_noise v1.1 não encontrado. Pode não ser necessário."
-}
-echo
-
-print_info "11.2. Baixando LoRA: wan2.2_t2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors"
-download_file \
-    "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/loras/wan2.2_t2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors" \
-    "$LORAS_DIR/wan2.2_t2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors" || {
-    print_warning "LoRA high_noise v1.1 não encontrado. Pode não ser necessário."
-}
-echo
+# COMENTADO: LoRAs não são necessários para o workflow atual
+# Os modelos base WAN 2.2 já funcionam bem sem LoRA
+# Descomente apenas se precisar de ajustes específicos de estilo
+# print_info "11. Baixando LoRAs Wan 2.2 v1.1 (opcionais mas recomendados)"
+# print_info "11.1. Baixando LoRA: wan2.2_t2v_lightx2v_4steps_lora_v1.1_low_noise.safetensors"
+# download_file \
+#     "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/loras/wan2.2_t2v_lightx2v_4steps_lora_v1.1_low_noise.safetensors" \
+#     "$LORAS_DIR/wan2.2_t2v_lightx2v_4steps_lora_v1.1_low_noise.safetensors" || {
+#     print_warning "LoRA low_noise v1.1 não encontrado. Pode não ser necessário."
+# }
+# echo
+# 
+# print_info "11.2. Baixando LoRA: wan2.2_t2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors"
+# download_file \
+#     "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/loras/wan2.2_t2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors" \
+#     "$LORAS_DIR/wan2.2_t2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors" || {
+#     print_warning "LoRA high_noise v1.1 não encontrado. Pode não ser necessário."
+# }
+# echo
 
 # ============================================
 # PARTE 3: CUSTOM NODES
@@ -465,10 +500,10 @@ echo
 echo "VFI (Frame Interpolation):"
 ls -lh "$VFI_DIR"/film_net* 2>/dev/null || echo "  (nenhum)"
 echo
-echo "LoRAs:"
-ls -lh "$LORAS_DIR"/wan2.2* 2>/dev/null || echo "  (nenhum - opcional)"
-echo "  Nota: Versão v1.1 (wan2.2_t2v_lightx2v_4steps_lora_v1.1_*) é a mais recente"
-echo
+# LoRAs: (comentado - não necessário para workflow atual)
+# ls -lh "$LORAS_DIR"/wan2.2* 2>/dev/null || echo "  (nenhum - opcional)"
+# echo "  Nota: Versão v1.1 (wan2.2_t2v_lightx2v_4steps_lora_v1.1_*) é a mais recente"
+# echo
 
 echo "=== CUSTOM NODES ==="
 ls -d "$CUSTOM_NODES_DIR"/*/ 2>/dev/null | while read dir; do
